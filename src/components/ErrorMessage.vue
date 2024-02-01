@@ -22,5 +22,3 @@ const goBack = () => {
   hasError.value = false
 }
 </script>
-
-<style scoped></style>

@@ -52,6 +52,10 @@ import ErrorMessage from '../components/ErrorMessage.vue'
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePokemonStore } from '../stores/pokemonStore'
+const store = usePokemonStore()
+const { hasError, nextPage, prevPage, allPokemon } = storeToRefs(store)
+const { getPokemon, filterPokemon } = store
+
 const pokemonsArray = ref([])
 
 onMounted(async () => {
@@ -61,12 +65,7 @@ onMounted(async () => {
   pokemonsArray.value = allPokemon.value
 })
 
-const store = usePokemonStore()
-const { hasError, nextPage, prevPage, allPokemon } = storeToRefs(store)
-const { getPokemon, filterPokemon } = store
-
 const searchInputValue = ref('')
-
 const handleFilterPokemon = () => {
   pokemonsArray.value = filterPokemon(searchInputValue)
   searchInputValue.value = ''

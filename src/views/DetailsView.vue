@@ -67,9 +67,11 @@ const { getPokemonDetails } = store
 const { pokemonDetail } = storeToRefs(store)
 const router = useRouter()
 const route = useRoute()
+
 onMounted(() => {
   getPokemonDetails(route.params)
 })
+
 const getPokemonImage = (pkmn) => {
   return pkmn.sprites?.other?.['official-artwork'].front_default
     ? pkmn.sprites?.other?.['official-artwork'].front_default
@@ -77,17 +79,8 @@ const getPokemonImage = (pkmn) => {
       ? pkmn.sprites?.front_default
       : 'src/assets/noPhoto.svg'
 }
+
 const goBack = () => {
   router.push('/')
 }
 </script>
-
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>

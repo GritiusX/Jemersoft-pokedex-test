@@ -32,5 +32,3 @@ const handleRouter = () => {
   router.push(`/${props.route}`)
 }
 </script>
-
-<style scoped></style>

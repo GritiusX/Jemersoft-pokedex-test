@@ -38,7 +38,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
     return allPokemon.value
   }
 
-  // Public method to get Pokemon based on the page or default URL
+  // Method to get Pokemon based on the page or default URL
   const getPokemon = async (page) => {
     try {
       isLoading.value = true
@@ -56,7 +56,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
     }
   }
 
-  // Public method to filter Pokemon based on search value
+  // Method to filter Pokemon based on search value
   const filterPokemon = (searchValue) => {
     const trimValue = searchValue.value.trim().toLowerCase()
 
@@ -85,7 +85,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
     }
   }
 
-  // Public method to get Pokemon details
+  // Method to get Pokemon details by it's ID
   const getPokemonDetails = async (pkmn) => {
     try {
       const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pkmn.id}`)
@@ -111,7 +111,6 @@ export const usePokemonStore = defineStore('pokemon', () => {
     }
   }
 
-  // Return public API of the store
   return {
     isLoading,
     hasError,

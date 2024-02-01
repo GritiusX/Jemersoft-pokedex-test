@@ -16,5 +16,3 @@ import { usePokemonStore } from '../stores/pokemonStore'
 const store = usePokemonStore()
 const { isLoading } = storeToRefs(store)
 </script>
-
-<style scoped></style>
