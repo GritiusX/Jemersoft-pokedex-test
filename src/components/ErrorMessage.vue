@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center gap-[10px] mt-[20px]">
+  <div class="flex flex-col items-center gap-[10px] mt-[20px] min-h-[calc(100vh-180px)]">
     <h3 class="font-bold text-3xl">Uh-oh!</h3>
     <p>You look lost on your journey!</p>
     <PokeButton

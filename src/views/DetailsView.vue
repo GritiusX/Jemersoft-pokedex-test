@@ -1,21 +1,15 @@
 <template>
   <div class="min-h-[calc(100vh-85px)]">
     <div class="flex flex-col items-center">
-      <div>
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 md:gap-8 my-[20px]">
         <img
-          class="w-[300px] my-[20px]"
+          class="max-w-[300px]"
           :src="getPokemonImage(pokemonDetail)"
           :alt="`${pokemonDetail.name} image`"
         />
-      </div>
-      <div class="flex flex-col items-center gap-2">
-        <div class="flex flex-col text-center">
-          <p class="capitalize font-bold text-3xl">{{ pokemonDetail.name }}</p>
-          <p class="text-center">{{ pokemonDetail.spanishDescription?.flavor_text }}</p>
-        </div>
-        <div class="flex w-full justify-evenly my-3">
+        <div class="flex flex-col gap-2 w-full justify-evenly my-3">
           <div
-            class="flex flex-col gap-2 bg-blue-400 p-3 rounded-xl cursor-default hover:bg-blue-800 hover:text-white transition-all duration-300"
+            class="flex flex-col gap-2 text-center bg-blue-400 p-3 rounded-xl cursor-default hover:bg-blue-800 hover:text-white transition-all duration-300"
           >
             <p class="capitalize text-lg">
               <span class="font-semibold">Altura:</span> {{ pokemonDetail.height }} pies
@@ -24,17 +18,25 @@
               <span class="font-semibold">Peso:</span> {{ pokemonDetail.weight }} kg
             </p>
           </div>
+
           <div
-            class="bg-red-500 p-3 rounded-xl cursor-default hover:bg-[#C00E20] hover:text-white transition-all duration-300"
+            class="bg-red-500 p-3 rounded-xl cursor-default text-center hover:bg-[#C00E20] hover:text-white transition-all duration-300"
           >
-            <span class="font-bold text-xl">Habilidades del Pokemon:</span>
-            <div class="grid grid-cols-2 gap-1 text-center">
+            <span class="font-bold text-xl">Habilidades:</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-center">
               <p class="capitalize" v-for="abilities in pokemonDetail.abilities" :key="abilities">
                 {{ abilities.ability.name }} &nbsp;
               </p>
             </div>
           </div>
         </div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col text-center">
+          <p class="capitalize font-bold text-3xl">{{ pokemonDetail.name }}</p>
+          <p class="text-center">{{ pokemonDetail.spanishDescription?.flavor_text }}</p>
+        </div>
+
         <span class="font-bold text-xl">Lista de movimientos:</span>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-10 gap-1">
           <p

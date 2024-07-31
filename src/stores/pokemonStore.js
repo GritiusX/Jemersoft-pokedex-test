@@ -7,107 +7,93 @@ export const usePokemonStore = defineStore('pokemon', () => {
   const hasError = ref(false)
   const pokemonDetail = ref({})
   const allPokemon = ref([])
+  const allPokemonUnfiltered = ref([])
   const totalCountPokemon = ref(null)
   const nextPage = ref(null)
   const prevPage = ref(null)
+  const currentOffset = ref(0)
+  const itemsPerPage = 25
 
-  // Helper function to fetch Pokemon details
   const fetchPokemonDetails = async (urls) => {
-    try {
-      const promises = urls.map((url) => axios.get(url))
-      const responses = await Promise.all(promises)
-      return responses.map((response) => response.data)
-    } catch (error) {
-      console.error('Error fetching Pokemon details:', error)
-      throw error
-    }
+    const responses = await Promise.all(urls.map((url) => axios.get(url)))
+    return responses.map((response) => response.data)
   }
 
-  // Helper function to fetch Pokemon data and details
   const fetchPokemonData = async (url) => {
     const { data } = await axios.get(url)
     nextPage.value = data.next
     prevPage.value = data.previous
     totalCountPokemon.value = data.count
-    allPokemon.value = data.results
+    currentOffset.value = new URL(url).searchParams.get('offset') || 0
 
-    const pokemonUrls = data.results.map((result) => result.url)
-    const pokemonDetails = await fetchPokemonDetails(pokemonUrls)
-
-    allPokemon.value = pokemonDetails.map((pkmn) => ({ ...pkmn }))
+    const pokemonDetails = await fetchPokemonDetails(data.results.map((result) => result.url))
+    allPokemon.value = pokemonDetails
+    allPokemonUnfiltered.value = [...pokemonDetails]
     return allPokemon.value
   }
 
-  // Method to get Pokemon based on the page or default URL
   const getPokemon = async (page) => {
     try {
       isLoading.value = true
-      await new Promise((resolve) => setTimeout(resolve, 1500)) // Fake timeout to show the pokeball Spinner for this demo
-
-      if (!page) {
-        return await fetchPokemonData('https://pokeapi.co/api/v2/pokemon/?limit=25&offset=0')
-      }
-
-      return await fetchPokemonData(page)
+      await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulated delay
+      const url = page || `https://pokeapi.co/api/v2/pokemon/?limit=${itemsPerPage}&offset=0`
+      return await fetchPokemonData(url)
     } catch (error) {
-      console.error('Failed to fetch all pokemons:', error)
+      console.error('Failed to fetch pokemons:', error)
+      hasError.value = true
     } finally {
       isLoading.value = false
     }
   }
 
-  // Method to filter Pokemon based on search value
-  const filterPokemon = (searchValue) => {
-    const trimValue = searchValue.value.trim().toLowerCase()
+  const filterPokemon = async (searchValue) => {
+    console.log(searchValue)
+    const trimValue = searchValue.trim().toLowerCase()
+    if (trimValue === '') return allPokemon.value
 
     try {
-      if (trimValue === '') {
-        return allPokemon.value
-      }
-
-      const isNumber = !isNaN(trimValue)
-
-      if (isNumber) {
-        hasError.value = true
-        return allPokemon.value
-      } else {
-        const filteredPokemon = allPokemon.value.filter((pkmn) => pkmn.name.includes(trimValue))
-
-        if (filteredPokemon.length > 0) {
-          return filteredPokemon
-        } else {
-          hasError.value = true
-          return allPokemon.value
-        }
-      }
+      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${trimValue}`)
+      allPokemon.value = [data]
+      nextPage.value = null
+      prevPage.value = null
     } catch (error) {
-      console.error('filterPokemonError', error)
+      console.error('Filter Pokemon Error:', error)
+      hasError.value = true
     }
+    return allPokemon.value
   }
 
-  // Method to get Pokemon details by it's ID
-  const getPokemonDetails = async (pkmn) => {
+  const clearFilters = () => {
+    allPokemon.value = [...allPokemonUnfiltered.value]
+    nextPage.value = `https://pokeapi.co/api/v2/pokemon/?limit=${itemsPerPage}&offset=${currentOffset.value}`
+    prevPage.value =
+      currentOffset.value > 0
+        ? `https://pokeapi.co/api/v2/pokemon/?limit=${itemsPerPage}&offset=${Math.max(0, currentOffset.value - itemsPerPage)}`
+        : null
+    hasError.value = false
+  }
+
+  const getPokemonDetails = async (pokemonId) => {
+    const { id } = pokemonId
     try {
-      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pkmn.id}`)
-      const { data: data2 } = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon-species/${pkmn.id}`
-      )
-      let spanishDescription = data2.flavor_text_entries.find(
+      const [pokemonData, speciesData] = await Promise.all([
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`),
+        axios.get(`https://pokeapi.co/api/v2/pokemon-species/${id}`)
+      ])
+
+      const spanishDescription = speciesData.data.flavor_text_entries.find(
         (entry) => entry.language.name === 'es'
       )
-      let fullPokemonDetails = {
-        ...data,
+
+      pokemonDetail.value = {
+        ...pokemonData.data,
         spanishDescription
       }
-      pokemonDetail.value = fullPokemonDetails
-      if (pokemonDetail.value) {
-        console.log(pokemonDetail.value)
-        return pokemonDetail.value
-      } else {
-        console.error('Matching Pokemon not found')
-      }
+
+      return pokemonDetail.value
     } catch (error) {
-      console.error('Error fetching Pokemon details', error)
+      console.error('Error fetching Pokemon details:', error)
+      hasError.value = true
     }
   }
 
@@ -121,6 +107,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
     prevPage,
     getPokemon,
     filterPokemon,
-    getPokemonDetails
+    getPokemonDetails,
+    clearFilters
   }
 })
